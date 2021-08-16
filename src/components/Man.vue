@@ -1,13 +1,6 @@
 <template>
   <div>
-    <van-nav-bar
-      title="标题"
-      left-text="返回"
-      right-text="按钮"
-      left-arrow
-      @click-left="handType"
-      @click-right="handType"
-    />
+
     <van-cell-group>
       <van-field
         v-model="szx.value"
@@ -35,7 +28,35 @@
         @click="show_account = true"
         placeholder="选择账号"
       />
+      <van-field
+        v-model="selectDate"
+        clearable
+        label="时间"
+        left-icon="music-o"
+        @click="show_datetime = true"
+        placeholder="选择时间"
+        :readonly="true"
+        is-link
+      />
+
+
     </van-cell-group>
+    <van-popup  v-model="show_datetime" position="bottom" :style="{ height: '70%' }" @opened="date_time_popup_opened">
+      <van-datetime-picker
+        id="doney"
+        ref="datetime-picker"
+        v-model="selectDate"
+        type="datetime"
+        title="选择时间"
+        @confirm="datetime_confirm"
+        @cancel="show_datetime = false"
+        @change="datetime_change"
+        :min-date="minDate"
+        :max-date="maxDate"
+        :value="selectDate"
+      />
+    </van-popup>
+
     <van-popup v-model="show" position="bottom" :style="{ height: '70%' }" >
       <van-tabs v-model="active">
         <van-tab title="支出">
@@ -194,6 +215,7 @@ let tmp_account=[
     "is_cash": 0
   }
 ]
+let currentTime = new Date()
 export default {
   name: 'HelloWorld',
   data () {
@@ -207,7 +229,12 @@ export default {
       active:0,
       active_type:0,
       type:tmp_type,
-      account:tmp_account
+      commonType:[1,2,3],
+      account:tmp_account,
+      selectDate:currentTime,
+      show_datetime:false,
+      minDate: new Date(2020, 0, 1),
+      maxDate: new Date(2025, 10, 1),
     }
   },
   methods:{
@@ -252,6 +279,16 @@ export default {
     },
     onDelete(){
       this.subtotal.value = this.subtotal.value.substr(0,this.subtotal.value.length-1)
+    },
+    datetime_confirm(datetime){
+      this.selectDate = datetime
+      this.show_datetime = false
+    },
+    datetime_change(picker){
+
+    },
+    date_time_popup_opened(){
+      this.$set(this.$refs['datetime-picker'],'value',this.selectDate);
     }
   }
 }
